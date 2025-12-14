@@ -2,26 +2,32 @@ import asyncio
 import websockets
 import json
 import socket
-import time
 
-TCP_HOST = "127.0.0.1"
-TCP_PORT = 5000
-RUN_DURATION = 1800  # 30 Minutes
+# --- CONFIGURATION ---
+MULTICAST_GROUP = "239.0.0.1"
+MULTICAST_PORT = 30001
+RUN_DURATION = 120  # 30 Minutes
 
+# --- DATA SOURCES ---
 SOURCES = [
     {"name": "BINANCE",  "url": "wss://stream.binance.com:9443/ws/btcusdt@trade"},
     {"name": "COINBASE", "url": "wss://ws-feed.exchange.coinbase.com"},
     {"name": "BITSTAMP", "url": "wss://ws.bitstamp.net"}
 ]
 
-async def forward_to_engine(writer, fix_msg):
-    try:
-        writer.write(fix_msg.encode())
-        await writer.drain()
-    except Exception as e:
-        print(f"[TCP ERROR] {e}")
+# Setup UDP Multicast Socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
-async def stream_binance(writer):
+def send_multicast(fix_msg):
+    try:
+        sock.sendto(fix_msg.encode(), (MULTICAST_GROUP, MULTICAST_PORT))
+        # Optional: Print a dot for every message to verify liveness without spam
+        # print(".", end="", flush=True) 
+    except Exception as e:
+        print(f"[ERROR] UDP Send Failed: {e}")
+
+async def stream_binance():
     url = SOURCES[0]["url"]
     async for websocket in websockets.connect(url):
         try:
@@ -30,12 +36,14 @@ async def stream_binance(writer):
                 msg = await websocket.recv()
                 data = json.loads(msg)
                 price = data['p']
+                # Tag 49 identifies the Source Exchange
                 fix = f"8=FIX.4.2\x0135=X\x0149=BINANCE\x0155=BTCUSDT\x01269=0\x01270={price}\x01"
-                await forward_to_engine(writer, fix)
+                send_multicast(fix)
         except Exception:
+            await asyncio.sleep(1) # Reconnect delay
             continue
 
-async def stream_coinbase(writer):
+async def stream_coinbase():
     url = SOURCES[1]["url"]
     async for websocket in websockets.connect(url):
         try:
@@ -51,11 +59,12 @@ async def stream_coinbase(writer):
                 if 'price' in data:
                     price = data['price']
                     fix = f"8=FIX.4.2\x0135=X\x0149=COINBASE\x0155=BTCUSD\x01269=0\x01270={price}\x01"
-                    await forward_to_engine(writer, fix)
+                    send_multicast(fix)
         except Exception:
+            await asyncio.sleep(1)
             continue
 
-async def stream_bitstamp(writer):
+async def stream_bitstamp():
     url = SOURCES[2]["url"]
     async for websocket in websockets.connect(url):
         try:
@@ -71,34 +80,26 @@ async def stream_bitstamp(writer):
                 if 'data' in data and 'price' in data['data']:
                     price = data['data']['price']
                     fix = f"8=FIX.4.2\x0135=X\x0149=BITSTAMP\x0155=BTCUSD\x01269=0\x01270={price}\x01"
-                    await forward_to_engine(writer, fix)
+                    send_multicast(fix)
         except Exception:
+            await asyncio.sleep(1)
             continue
 
 async def main():
-    server = await asyncio.start_server(handle_client, TCP_HOST, TCP_PORT)
-    addr = server.sockets[0].getsockname()
-    print(f"[GATEWAY] Multi-Source Bridge listening on {addr}")
-    print(f"[GATEWAY] Test Duration: {RUN_DURATION / 60} Minutes")
+    print(f"[GATEWAY] Starting Multi-Exchange UDP Broadcast to {MULTICAST_GROUP}:{MULTICAST_PORT}")
+    print(f"[GATEWAY] Aggregating Liquidity from Binance, Coinbase, Bitstamp...")
 
-    async with server:
-        await server.serve_forever()
-
-async def handle_client(reader, writer):
-    print("[GATEWAY] Shaurya Engine Connected! Starting Streams...")
-    
+    # Run all streams concurrently
     tasks = [
-        asyncio.create_task(stream_binance(writer)),
-        asyncio.create_task(stream_coinbase(writer)),
-        asyncio.create_task(stream_bitstamp(writer))
+        asyncio.create_task(stream_binance()),
+        asyncio.create_task(stream_coinbase()),
+        asyncio.create_task(stream_bitstamp())
     ]
 
+    # Run for the specified duration
     await asyncio.sleep(RUN_DURATION)
     
-    print("\n[GATEWAY] 30 Minutes Complete. Stopping Test...")
-    writer.close()
-    await writer.wait_closed()
-    
+    print("\n[GATEWAY] Test Duration Complete. Stopping...")
     for task in tasks:
         task.cancel()
 
@@ -106,4 +107,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        pass
+        print("Gateway Stopped.")

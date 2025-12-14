@@ -1,0 +1,26 @@
+[project]
+name = "hft.shaurya"  # Make sure this is unique!
+version = "0.1.0"
+description = "Ultra-Low Latency C++ HFT Engine for Python by falcon7"
+authors = [{name = "Harshit Kumar Singh", email = "harshitsinghcode@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "License :: OSI Approved :: MIT License",
+]
+
+[tool.cibuildwheel]
+# Skip 32-bit builds and PyPy (optional, speeds up build)
+skip = ["*-win32", "*-manylinux_i686", "pp*"]
+
+[tool.cibuildwheel.windows]
+# Ensure CMake is available on Windows runners
+before-build = "pip install cmake"
+
+[tool.cibuildwheel.linux]
+# Ensure CMake is available on Linux runners
+before-build = "pip install cmake"

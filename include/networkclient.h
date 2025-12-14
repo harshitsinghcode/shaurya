@@ -1,14 +1,19 @@
 #pragma once
 #include <string>
-#include <functional>
 #include <winsock2.h>
-#include <windows.h>
-using DataCallback = std::function<void(const char*, size_t)>;
+#include <ws2tcpip.h>
 
 class NetworkClient {
     SOCKET sock;
 public:
+    NetworkClient(); // Constructor
+    ~NetworkClient(); // Destructor to close socket
+
+    // This was missing!
+    bool joinMulticast(const std::string& groupIP, int port);
+    
+    // We keep this for compatibility if you switch back to TCP
     bool connectToServer(const std::string& ip, int port);
-    void startListenLoop(DataCallback onData); 
+
     SOCKET getSocket() const { return sock; }
 };
