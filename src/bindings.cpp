@@ -25,6 +25,10 @@ public:
     void stop() {
         engine.stop();
     }
+
+    void run_backtest(std::string file) {
+        py::gil_scoped_release release; 
+    }
 };
 
 PYBIND11_MODULE(shaurya_hft, m) {
@@ -35,4 +39,5 @@ PYBIND11_MODULE(shaurya_hft, m) {
         .def("start", &PyShaurya::start, "Start the HFT Engine connection")
         .def("stop", &PyShaurya::stop, "Stop the Engine")
         .def("get_latency", &PyShaurya::get_latency, "Get minimum recorded latency");
+        .def("run_backtest", &PyShaurya::run_backtest);
 }
