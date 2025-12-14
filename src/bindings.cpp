@@ -2,15 +2,12 @@
 #include <thread>
 #include <chrono>
 
-// FIX: Use quotes and remove "../include/" because CMake handles the path
 #include "ShauryaEngine.h" 
 #include "Logger.h"
 #include "Stats.h"
 
-// --- MEMORY DEFINITIONS ---
 std::mutex Logger::mux;
 std::vector<double> Stats::latencies;
-// --------------------------
 
 namespace py = pybind11;
 

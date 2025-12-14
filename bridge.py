@@ -3,27 +3,22 @@ import websockets
 import json
 import socket
 
-# --- CONFIGURATION ---
 MULTICAST_GROUP = "239.0.0.1"
 MULTICAST_PORT = 30001
-RUN_DURATION = 120  # 30 Minutes
+RUN_DURATION = 120 
 
-# --- DATA SOURCES ---
 SOURCES = [
     {"name": "BINANCE",  "url": "wss://stream.binance.com:9443/ws/btcusdt@trade"},
     {"name": "COINBASE", "url": "wss://ws-feed.exchange.coinbase.com"},
     {"name": "BITSTAMP", "url": "wss://ws.bitstamp.net"}
 ]
 
-# Setup UDP Multicast Socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
 def send_multicast(fix_msg):
     try:
         sock.sendto(fix_msg.encode(), (MULTICAST_GROUP, MULTICAST_PORT))
-        # Optional: Print a dot for every message to verify liveness without spam
-        # print(".", end="", flush=True) 
     except Exception as e:
         print(f"[ERROR] UDP Send Failed: {e}")
 
@@ -36,11 +31,10 @@ async def stream_binance():
                 msg = await websocket.recv()
                 data = json.loads(msg)
                 price = data['p']
-                # Tag 49 identifies the Source Exchange
                 fix = f"8=FIX.4.2\x0135=X\x0149=BINANCE\x0155=BTCUSDT\x01269=0\x01270={price}\x01"
                 send_multicast(fix)
         except Exception:
-            await asyncio.sleep(1) # Reconnect delay
+            await asyncio.sleep(1)
             continue
 
 async def stream_coinbase():
@@ -89,14 +83,12 @@ async def main():
     print(f"[GATEWAY] Starting Multi-Exchange UDP Broadcast to {MULTICAST_GROUP}:{MULTICAST_PORT}")
     print(f"[GATEWAY] Aggregating Liquidity from Binance, Coinbase, Bitstamp...")
 
-    # Run all streams concurrently
     tasks = [
         asyncio.create_task(stream_binance()),
         asyncio.create_task(stream_coinbase()),
         asyncio.create_task(stream_bitstamp())
     ]
 
-    # Run for the specified duration
     await asyncio.sleep(RUN_DURATION)
     
     print("\n[GATEWAY] Test Duration Complete. Stopping...")

@@ -1,25 +1,20 @@
 cmake_minimum_required(VERSION 3.15)
 project(shaurya_hft)
 
-# 1. Find Python and Pybind11
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
-# 2. Create the Module
 pybind11_add_module(shaurya_hft src/bindings.cpp src/FixParser.cpp src/NetworkClient.cpp)
 
-# 3. Optimizations
 if(MSVC)
     target_compile_options(shaurya_hft PRIVATE /O2)
 else()
     target_compile_options(shaurya_hft PRIVATE -O3 -march=native)
 endif()
 
-# 4. Includes & Links
 target_include_directories(shaurya_hft PRIVATE include)
 if(WIN32)
     target_link_libraries(shaurya_hft PRIVATE ws2_32)
 endif()
 
-# 5. CRITICAL FIX: Tell CMake to install the file into the package!
 install(TARGETS shaurya_hft DESTINATION .)

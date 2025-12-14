@@ -37,7 +37,6 @@ bool NetworkClient::joinMulticast(const std::string& groupIP, int port) {
         return false;
     }
 
-    // Non-blocking mode
     u_long mode = 1;
     ioctlsocket(sock, FIONBIO, &mode);
 

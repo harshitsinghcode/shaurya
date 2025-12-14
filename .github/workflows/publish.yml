@@ -13,17 +13,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Build on Windows (YOU), Linux (Servers), and Mac (Devs)
         os: [windows-latest]
 
     steps:
       - uses: actions/checkout@v4
 
-      # Used to build the C++ Extension automatically
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
-        # env:
-        #   CIBW_SOME_OPTION: value
 
       - uses: actions/upload-artifact@v4
         with:
@@ -47,8 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write  # IMPORTANT: Mandatory for trusted publishing
-
+      id-token: write 
     steps:
       - name: Download all the dists
         uses: actions/download-artifact@v4
