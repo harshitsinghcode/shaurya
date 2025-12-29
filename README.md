@@ -50,6 +50,10 @@ Critical data structures are aligned to 64-byte cache lines (`alignas(64)`). Thi
 
 ## 🚀 Quick Start
 
+```
+pip install hft.shaurya
+```
+
 ### Prerequisites
 * **OS:** Windows (Required for `winsock2` and `QueryPerformanceCounter`)
 * **Compiler:** G++ (MinGW) supporting C++11 or higher.
