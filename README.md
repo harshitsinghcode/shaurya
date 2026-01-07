@@ -50,27 +50,49 @@ Critical data structures are aligned to 64-byte cache lines (`alignas(64)`). Thi
 
 ## 🚀 Quick Start
 
-```
+## 🐍 Python Package Usage
+
++ After installing via `pip`, you can integrate **Shaurya** directly into your Python trading strategies or research notebooks to access C++ performance with Python simplicity.
+
+### Installation
+
+```bash
 pip install hft.shaurya
+
 ```
 
-### Prerequisites
-* **OS:** Windows (Required for `winsock2` and `QueryPerformanceCounter`)
-* **Compiler:** G++ (MinGW) supporting C++11 or higher.
++ Create a Python script (e.g., main.py) to initialize the engine and listen for market data.
++ Note: Ensure you are running the MultiSourceUDP.py simulator (or have a real UDP feed active) before starting the engine.
 
-### Execution Guide
-1.  **Build the System:**
-    ```cmd
-    build.bat
-    ```
-2.  **Start Data Source:** 
-    ```python bridge.py```
-3.  **Start Shaurya Engine:**
-    ```cmd
-    bin\Shaurya.exe
-    ```
+```python
+import shaurya_hft
+import time
 
-*Upon completion, the engine generates a `Shaurya_Metrics.txt` report detailing the nanosecond-level performance of the run.*
+def main():
+    print("Initializing Shaurya HFT Engine...")
+    print("🚀 Engine Started. Listening for live ticks...")
+    try:
+        while True:
+            latency = engine.get_latency()
+            if latency > 0:
+                print(f"⚡ Tick Processed | Latency: {latency:.4f} μs")
+            time.sleep(0.5)
+
+    except KeyboardInterrupt:
+        print("\nStopping Engine...")
+        engine.stop()
+        print("Engine Shutdown Complete.")
+
+if __name__ == "__main__":
+    main()
+```
+
+| Function | Description |
+|---------|-------------|
+| `engine = shaurya_hft.Engine()` | Initializes the C++ memory structures and lock-free ring buffers. |
+| `engine.start(ip, port)` | Spawns the high-performance C++ network thread to listen on the specified UDP multicast group and releases the Python GIL. |
+| `engine.get_latency()` | Returns the processing latency (in microseconds) of the most recent packet; thread-safe and lock-free. |
+| `engine.stop()` | Safely signals the C++ thread to terminate and cleans up socket resources. |
 
 ---
 
