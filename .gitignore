@@ -21,11 +21,11 @@ __pycache__/
 
 # 3. Third-Party Header Libraries
 # (These should be downloaded by the user, not tracked in Git to save space)
-eigen/
-frugally-deep/
-FunctionalPlus/
-json/
-verilator_include/
+eigen
+frugally-deep
+FunctionalPlus
+json
+verilator_include
 
 # 4. Dynamically Generated Reports & Logs
 Shaurya_Metrics.txt
