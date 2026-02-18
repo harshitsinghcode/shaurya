@@ -365,7 +365,7 @@ Real-world examples of:
 - Education  
 - Systems experimentation  
 
-`It is **not financial advice** and **not production-certified trading infrastructure**.`
+`It is not financial advice and not production-certified trading infrastructure.`
 
 > Users assume full responsibility for:
 
