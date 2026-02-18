@@ -34,12 +34,8 @@ void processorThreadFunc() {
 int main() {
     Logger::log("Starting Shaurya Engine (HFT Mode)...");
 
-    // --- FIX: Warmup Pass must be INSIDE main ---
-    // This primes the CPU cache and eliminates the 1000us "Cold Start" spike
     Logger::log("Warming up AI Inference Engine...");
     for(int i=0; i<10; i++) {
-        // Access your brain instance here
-        // brain.predict(68000.0); 
     }
 
     std::thread processor(processorThreadFunc);
@@ -85,7 +81,6 @@ int main() {
             receivedAnyData = true;
         } 
         else if (bytes == 0 || (bytes < 0 && WSAGetLastError() != WSAEWOULDBLOCK)) {
-            // Connection closed or error
             break;
         }
         else {

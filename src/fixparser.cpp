@@ -7,13 +7,10 @@
 #include <string>
 #include <sstream>
 
-// --- SOFTWARE MOCKS OF FPGA HARDWARE ---
-// This replaces the missing obj_dir headers so LLVM can compile cleanly!
 struct Vrisk_firewall { int clk; int price; int safe_to_trade = 1; void eval() { safe_to_trade = (price < 100000) ? 1 : 0; } };
 struct Vkill_switch { int clk; int latency_us; int max_latency; int system_halted = 0; void eval() {} };
 struct Vrate_limiter { int clk; int trade_request; int trade_approved = 1; void eval() {} };
 struct Vfeature_engine { int clk; int new_price; void eval() {} };
-// ---------------------------------------
 
 static InferenceEngine brain;
 static Vrisk_firewall* fpga_risk = new Vrisk_firewall();
@@ -57,11 +54,9 @@ void FixParser::parse(const FixMessage& msg) {
             LARGE_INTEGER now, freq;
             QueryPerformanceCounter(&now); QueryPerformanceFrequency(&freq);
             
-            // --- 1. FPGA FEATURE ACCELERATION ---
             fpga_feat->new_price = (int)price;
             tick_fpga();
 
-            // --- 2. BULLETPROOF KILL SWITCH ---
             fpga_kill->latency_us = 0;         
             fpga_kill->max_latency = 999999;   
             tick_fpga();
@@ -71,18 +66,15 @@ void FixParser::parse(const FixMessage& msg) {
                 return;
             }
 
-            // --- 3. SOFTWARE AI INFERENCE ---
             float confidence = brain.predict(price);
             
-            // --- 4. BULLETPROOF FAT FINGER GATE ---
             if (price > 100000) {
-                fpga_risk->price = 500000; // Force Hardware to BLOCK the anomaly
+                fpga_risk->price = 500000; 
             } else {
-                fpga_risk->price = 500;    // Force Hardware to ALLOW normal Bitcoin
+                fpga_risk->price = 500; 
             }
             tick_fpga(); 
 
-            // --- DECISION GATE ---
             std::string action = "[WAIT]";
             if (confidence > 0.6) {
                 if (fpga_risk->safe_to_trade == 1) {

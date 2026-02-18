@@ -3,8 +3,6 @@ import websockets
 import json
 import socket
 
-# C:\Users\Admin\shaurya\bridge.py
-
 SOURCES = [
     {"name": "BINANCE",  "url": "wss://stream.binance.com:9443/ws/btcusdt@trade"},
     {"name": "COINBASE", "url": "wss://ws-feed.exchange.coinbase.com"},
@@ -17,7 +15,6 @@ async def send_to_cpp(conn, loop, fix_msg):
     global global_ticks
     global_ticks += 1
     
-    # --- DEMO FEATURE: Inject Anomaly every 30 ticks to trigger FPGA ---
     if global_ticks % 30 == 0:
         print("\n[GATEWAY] INJECTING FAT FINGER ANOMALY ($250,000) TO TEST FPGA...\n")
         fix_msg = "8=FIX.4.2\x0135=X\x0149=ANOMALY\x0155=BTCUSDT\x01269=0\x01270=250000.00\x01"
@@ -25,7 +22,7 @@ async def send_to_cpp(conn, loop, fix_msg):
     try:
         await loop.sock_sendall(conn, fix_msg.encode())
     except Exception as e:
-        pass # Ignore if C++ disconnects
+        pass 
 
 async def stream_binance(conn, loop):
     url = SOURCES[0]["url"]
@@ -38,7 +35,7 @@ async def stream_binance(conn, loop):
                     price = data['p']
                     fix = f"8=FIX.4.2\x0135=X\x0149=BINANCE\x0155=BTCUSDT\x01269=0\x01270={price}\x01"
                     await send_to_cpp(conn, loop, fix)
-                    await asyncio.sleep(0.1) # Throttle to prevent Windows buffer overflow
+                    await asyncio.sleep(0.1) 
         except Exception:
             await asyncio.sleep(1)
 
@@ -91,11 +88,9 @@ def start_tcp_server():
     return conn
 
 async def main():
-    # 1. Start TCP Server and wait for C++
     conn = start_tcp_server()
     loop = asyncio.get_event_loop()
 
-    # 2. Start streaming from all 3 exchanges simultaneously
     tasks = [
         asyncio.create_task(stream_binance(conn, loop)),
         asyncio.create_task(stream_coinbase(conn, loop)),

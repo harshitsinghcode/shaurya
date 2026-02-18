@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Convert a Keras model to frugally-deep format.
 """
 
@@ -10,7 +9,7 @@ import json
 from typing import Tuple, Union, Mapping, List, Callable, Set, Any, TypeVar
 
 import numpy as np
-import numpy.typing  # pylint: disable=unused-import
+import numpy.typing  
 from keras import backend as K, Layer
 from keras.layers import Input, Embedding, CategoryEncoding
 from keras.models import Model, load_model
@@ -671,7 +670,6 @@ def convert_sequential_to_model(model: Model) -> Model:
             new_layer = convert_sequential_to_model(model.layers[i])
             if new_layer == model.layers[i]:
                 continue
-            # https://stackoverflow.com/questions/78297541/how-to-replace-a-model-layer-using-tensorflow-2-16
             model._operations[i] = new_layer
             assert model.layers[i] == new_layer
     return model
@@ -696,9 +694,6 @@ def calculate_hash(model: Model) -> str:
 def model_to_fdeep_json(model: Model, no_tests: bool = False) -> Mapping[str, Any]:
     """Convert any Keras model to the frugally-deep model format."""
 
-    # Force creation of underlying functional model.
-    # see: https://github.com/fchollet/keras/issues/8136
-    # Loss and optimizer type do not matter, since we do not train the model.
     model.compile(loss='mse', optimizer='sgd')
 
     model = convert_sequential_to_model(model)
