@@ -1,6 +1,6 @@
 [project]
 name = "hft.shaurya"  # Make sure this is unique!
-version = "0.1.0"
+version = "0.2.0"
 description = "Ultra-Low Latency C++ HFT Engine for Python by falcon7"
 authors = [{name = "Harshit Kumar Singh", email = "harshitsinghcode@gmail.com"}]
 readme = "README.md"
