@@ -1,0 +1,41 @@
+# ==========================================
+# SHAURYA HFT ENGINE - .gitignore
+# ==========================================
+
+# 1. Compiled Binaries & Build Outputs
+bin/
+obj_dir/
+dist/
+*.exe
+*.dll
+*.o
+*.obj
+*.pdb
+
+# 2. Python Virtual Environment & Cache
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 3. Third-Party Header Libraries
+# (These should be downloaded by the user, not tracked in Git to save space)
+eigen/
+frugally-deep/
+FunctionalPlus/
+json/
+verilator_include/
+
+# 4. Dynamically Generated Reports & Logs
+Shaurya_Metrics.txt
+*.log
+
+# 5. OS & Editor Specific Files
+.vscode/
+.vs/
+*.swp
+.DS_Store
+
+# 6. Temporary / Backup Files
+full-code

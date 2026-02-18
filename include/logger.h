@@ -9,6 +9,6 @@ public:
 
     static void log(const std::string& msg) {
         std::lock_guard<std::mutex> lock(mux);
-        std::cout << "[shaurya] " << msg << std::endl;
+        // std::cout << "[shaurya] " << msg << std::endl;
     }
 };
