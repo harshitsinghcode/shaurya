@@ -1,0 +1,31 @@
+=== SHAURYA DASHBOARD SNAPSHOT ===
+Exchange: OFFLINE
+Engine: OFFLINE
+Uptime: 00:00:00
+Total Trades: 0
+Approved: 0
+Blocked: 0
+Last Latency (us): N/A
+Last Action: N/A
+
+=== EXCHANGE LOG ===
+[SYSTEM] Starting Mock Exchange Server on Port 5000...
+[EXCHANGE] Market Open. Waiting for connections on Port 5000...
+[EXCHANGE] Trader Connected! Sending Market Data...
+[EXCHANGE] Market Closed.
+
+
+=== SHAURYA LOG ===
+[SYSTEM] Booting LLVM Fused Shaurya Engine...
+
+========================================
+       PERFORMANCE REPORT (SHAURYA)     
+========================================
+Total Messages : 50
+Min Latency    : 1.5 us
+Max Latency    : 324.1 us
+Avg Latency    : 11.21 us
+99th Percentile: 324.1 us  <-- CRITICAL
+========================================
+[Shaurya] Report saved to: Shaurya_Metrics.txt
+
