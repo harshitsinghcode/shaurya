@@ -11,7 +11,7 @@ dist/
 *.o
 *.obj
 *.pdb
-
+falcon-node.pem
 # 2. Python Virtual Environment & Cache
 venv/
 __pycache__/

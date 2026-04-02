@@ -8,15 +8,10 @@
 #include "../include/Stats.h"
 #include <windows.h> 
 
-// Global Objects
 std::mutex Logger::mux;
 std::vector<double> Stats::latencies;
 LockFreeQueue<FixMessage, 1024> messageQueue;
 std::atomic<bool> keepRunning(true);
-
-// Move the brain declaration or access here depending on your header structure
-// For example, if it's a static member of FixParser:
-// extern InferenceEngine brain; 
 
 void processorThreadFunc() {
     Logger::log("Processor Thread Started...");
@@ -25,7 +20,6 @@ void processorThreadFunc() {
         if (messageQueue.pop(msg)) {
             FixParser::parse(msg);
         } else {
-            // High-frequency sleep (yields CPU without long pause)
             YieldProcessor(); 
         }
     }

@@ -1,6 +1,3 @@
-"""Convert a Keras model to frugally-deep format.
-"""
-
 import argparse
 import base64
 import datetime
