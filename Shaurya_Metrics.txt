@@ -1,28 +1,28 @@
 SHAURYA HFT ENGINE - LATENCY REPORT
 -----------------------------------
 Total Messages : 20
-Avg Latency    : 4.02 us
-Max Latency    : 32.6 us
-P99 Latency    : 32.6 us
+Avg Latency    : 55.3 us
+Max Latency    : 1031.9 us
+P99 Latency    : 1031.9 us
 
 --- Raw Data (Microseconds) ---
 1.7
+1.7
+1.8
+1.8
+2
+2
+2
+2
 2
 2.1
-2.1
-2.1
 2.2
-2.3
-2.3
-2.3
-2.5
-2.5
-2.7
-2.7
+2.2
+2.2
+2.4
+2.6
+2.8
 2.8
 2.9
-3
-3
-3.2
-3.4
-32.6
+34.9
+1031.9
