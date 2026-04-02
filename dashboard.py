@@ -3,6 +3,7 @@ from tkinter import scrolledtext
 import subprocess
 import threading
 import os
+import sys
 import re
 import time
 from datetime import datetime
@@ -10,7 +11,7 @@ from datetime import datetime
 class ShauryaGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("SHAURYA v0.2.0")
+        self.root.title("SHAURYA v0.2.0 - LIVE INJECTOR")
         self.root.geometry("1260x760")
         self.root.configure(bg="#1e1e1e")
 
@@ -28,7 +29,6 @@ class ShauryaGUI:
         self.p99_latency_us = "N/A"
         self.last_action = "N/A"
 
-       
         self.trade_summary_pattern = re.compile(r"Processed\s+(\d+)\s+live\s+trades", re.IGNORECASE)
         self.total_messages_pattern = re.compile(r"Total\s+Messages\s*:\s*(\d+)", re.IGNORECASE)
         self.min_latency_pattern = re.compile(r"Min\s+Latency\s*:\s*([0-9]+(?:\.[0-9]+)?)\s*us", re.IGNORECASE)
@@ -59,24 +59,24 @@ class ShauryaGUI:
             "Last Action": tk.StringVar(value="N/A"),
         }
 
+        # --- CONTROL PANEL ---
         btn_frame = tk.Frame(root, bg="#1e1e1e")
         btn_frame.pack(pady=(14, 8))
 
-        self.btn_exo = tk.Button(btn_frame, text="1. Start Market (Exchange)", command=self.start_exo, 
-                                 bg="#2d2d2d", fg="white", font=("Consolas", 12, "bold"), width=25, relief=tk.FLAT)
-        self.btn_exo.grid(row=0, column=0, padx=10)
+        # Stock Input
+        tk.Label(btn_frame, text="Stock Symbol:", bg="#1e1e1e", fg="white", font=("Consolas", 12, "bold")).grid(row=0, column=0, padx=5)
+        self.symbol_entry = tk.Entry(btn_frame, font=("Consolas", 12, "bold"), width=8, bg="#2d2d2d", fg="#00ff00", insertbackground="white")
+        self.symbol_entry.insert(0, "KLAC")
+        self.symbol_entry.grid(row=0, column=1, padx=(0, 20))
 
-        self.btn_shaurya = tk.Button(btn_frame, text="2. Start Shaurya Engine", command=self.start_shaurya, 
-                                     bg="#005f00", fg="white", font=("Consolas", 12, "bold"), width=25, relief=tk.FLAT)
-        self.btn_shaurya.grid(row=0, column=1, padx=10)
+        # Buttons
+        self.btn_start_all = tk.Button(btn_frame, text="▶ START ALL (20s)", command=self.start_all,
+                                       bg="#005f00", fg="white", font=("Consolas", 11, "bold"), width=18, relief=tk.FLAT)
+        self.btn_start_all.grid(row=0, column=2, padx=8)
 
-        self.btn_stop = tk.Button(btn_frame, text="[ STOP ALL ]", command=self.stop_all, 
-                                  bg="#8b0000", fg="white", font=("Consolas", 12, "bold"), width=15, relief=tk.FLAT)
-        self.btn_stop.grid(row=0, column=2, padx=10)
-
-        self.btn_start_all = tk.Button(btn_frame, text="Start All", command=self.start_all,
-                                       bg="#003f7f", fg="white", font=("Consolas", 11, "bold"), width=12, relief=tk.FLAT)
-        self.btn_start_all.grid(row=0, column=3, padx=8)
+        self.btn_stop = tk.Button(btn_frame, text="■ STOP ALL", command=self.stop_all, 
+                                  bg="#8b0000", fg="white", font=("Consolas", 11, "bold"), width=12, relief=tk.FLAT)
+        self.btn_stop.grid(row=0, column=3, padx=8)
 
         self.btn_restart_engine = tk.Button(btn_frame, text="Restart Engine", command=self.restart_shaurya,
                                             bg="#5f4b00", fg="white", font=("Consolas", 11, "bold"), width=15, relief=tk.FLAT)
@@ -90,6 +90,7 @@ class ShauryaGUI:
                                            bg="#195f5f", fg="white", font=("Consolas", 11), width=14, relief=tk.FLAT)
         self.btn_save_snapshot.grid(row=0, column=6, padx=8)
 
+        # --- METRICS PANEL ---
         panel_frame = tk.Frame(root, bg="#1e1e1e")
         panel_frame.pack(fill=tk.X, padx=15, pady=(0, 10))
 
@@ -123,12 +124,13 @@ class ShauryaGUI:
 
         self.refresh_verilog_status()
 
+        # --- LOG CONSOLES ---
         console_frame = tk.Frame(root, bg="#1e1e1e")
         console_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=10)
 
         exo_frame = tk.Frame(console_frame, bg="#1e1e1e")
         exo_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
-        tk.Label(exo_frame, text="Market EXCHANGE", bg="#1e1e1e", fg="#00ff00", font=("Consolas", 11, "bold")).pack(anchor="w")
+        tk.Label(exo_frame, text="REAL-TIME INJECTOR LOGS", bg="#1e1e1e", fg="#00ff00", font=("Consolas", 11, "bold")).pack(anchor="w")
         self.exo_text = scrolledtext.ScrolledText(exo_frame, bg="#0d0d0d", fg="#00ff00", font=("Consolas", 10), relief=tk.FLAT)
         self.exo_text.pack(fill=tk.BOTH, expand=True, pady=5)
 
@@ -141,7 +143,6 @@ class ShauryaGUI:
         self.root.after(500, self.refresh_runtime_status)
 
     def append_text(self, text_widget, text):
-        """Thread-safe way to update the GUI text boxes"""
         text_widget.insert(tk.END, text)
         text_widget.see(tk.END)
 
@@ -216,10 +217,11 @@ class ShauryaGUI:
     def process_line(self, source, text_widget, decoded):
         self.append_text(text_widget, decoded)
         self.handle_log_line(source, decoded)
+        # Print cleanly to terminal without double tags
+        print(decoded, end="")
 
     def read_output(self, process, text_widget):
-        """Reads console output from the C++ EXE in real-time"""
-        source = "exo" if text_widget is self.exo_text else "shaurya"
+        source = "injector" if text_widget is self.exo_text else "shaurya"
         for line in iter(process.stdout.readline, b''):
             if line:
                 decoded = line.decode('utf-8', errors='ignore')
@@ -250,11 +252,9 @@ class ShauryaGUI:
 
         if self.exo_process is not None and self.exo_process.poll() is not None:
             self.exo_process = None
-            self.btn_exo.config(state=tk.NORMAL, bg="#2d2d2d")
 
         if self.shaurya_process is not None and self.shaurya_process.poll() is not None:
             self.shaurya_process = None
-            self.btn_shaurya.config(state=tk.NORMAL, bg="#005f00")
 
         self.update_metric_labels()
         self.root.after(500, self.refresh_runtime_status)
@@ -279,8 +279,10 @@ class ShauryaGUI:
         self.append_text(self.shaurya_text, f"[SYSTEM] Snapshot saved to {output_name}\n")
 
     def start_all(self):
-        self.start_exo()
-        self.start_shaurya()
+        # 1. Start Injector Server first so it listens
+        self.start_injector()
+        # 2. Wait slightly to ensure port is open, then start engine
+        self.root.after(500, self.start_shaurya)
 
     def stop_process(self, process):
         if not process:
@@ -296,17 +298,22 @@ class ShauryaGUI:
         if self.shaurya_process:
             self.stop_process(self.shaurya_process)
             self.shaurya_process = None
-            self.btn_shaurya.config(state=tk.NORMAL, bg="#005f00")
             self.append_text(self.shaurya_text, "\n[SYSTEM] Engine restart requested.\n")
         self.start_shaurya()
 
-    def start_exo(self):
+    def start_injector(self):
         if not self.exo_process:
-            self.append_text(self.exo_text, "[SYSTEM] Starting Mock Exchange Server on Port 5000...\n")
-            self.exo_process = subprocess.Popen(["bin\\exo.exe"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=0x08000000)
+            symbol = self.symbol_entry.get().strip().upper()
+            if not symbol:
+                symbol = "MSFT"
+            
+            self.append_text(self.exo_text, f"[SYSTEM] Launching Real Stock Injector for {symbol} (20 Seconds)...\n")
+            
+            # Using -u flag to prevent log buffering
+            cmd = [sys.executable, "-u", "real_stock_injector.py", "--symbol", symbol, "--iterations", "20"]
+            self.exo_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=0x08000000)
             threading.Thread(target=self.read_output, args=(self.exo_process, self.exo_text), daemon=True).start()
             self.exo_start_time = time.time()
-            self.btn_exo.config(state=tk.DISABLED, bg="#555555")
 
     def start_shaurya(self):
         if not self.shaurya_process:
@@ -314,21 +321,18 @@ class ShauryaGUI:
             self.shaurya_process = subprocess.Popen(["bin\\Shaurya.exe"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=0x08000000)
             threading.Thread(target=self.read_output, args=(self.shaurya_process, self.shaurya_text), daemon=True).start()
             self.shaurya_start_time = time.time()
-            self.btn_shaurya.config(state=tk.DISABLED, bg="#555555")
 
     def stop_all(self):
         if self.exo_process:
             self.stop_process(self.exo_process)
             self.exo_process = None
             self.exo_start_time = None
-            self.btn_exo.config(state=tk.NORMAL, bg="#2d2d2d")
-            self.append_text(self.exo_text, "\n[SYSTEM] Exchange Terminated.\n")
+            self.append_text(self.exo_text, "\n[SYSTEM] Injector Terminated.\n")
             
         if self.shaurya_process:
             self.stop_process(self.shaurya_process)
             self.shaurya_process = None
             self.shaurya_start_time = None
-            self.btn_shaurya.config(state=tk.NORMAL, bg="#005f00")
             self.append_text(self.shaurya_text, "\n[SYSTEM] Shaurya Engine Terminated.\n")
 
         self.status_vars["Exchange"].set("OFFLINE")
@@ -336,13 +340,11 @@ class ShauryaGUI:
         self.status_vars["Uptime"].set("00:00:00")
 
 if __name__ == "__main__":
-    if not os.path.exists("bin\\exo.exe") or not os.path.exists("bin\\Shaurya.exe"):
-        print("CRITICAL ERROR: Could not find exo.exe or Shaurya.exe inside the 'bin' folder.")
-        print("Please compile your C++ files first!")
+    if not os.path.exists("real_stock_injector.py") or not os.path.exists("bin\\Shaurya.exe"):
+        print("CRITICAL ERROR: Could not find 'real_stock_injector.py' or 'bin\\Shaurya.exe'.")
+        print("Please ensure you run this from the project root!")
     else:
         root = tk.Tk()
         app = ShauryaGUI(root)
         root.protocol("WM_DELETE_WINDOW", lambda: (app.stop_all(), root.destroy()))
         root.mainloop()
-
-        
