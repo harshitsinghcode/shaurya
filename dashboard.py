@@ -310,7 +310,7 @@ class ShauryaGUI:
             self.append_text(self.exo_text, f"[SYSTEM] Launching Real Stock Injector for {symbol} (20 Seconds)...\n")
             
             # Using -u flag to prevent log buffering
-            cmd = [sys.executable, "-u", "real_stock_injector.py", "--symbol", symbol, "--iterations", "20"]
+            cmd = [sys.executable, "-u", "yahoo.py", "--symbol", symbol, "--iterations", "20"]
             self.exo_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=0x08000000)
             threading.Thread(target=self.read_output, args=(self.exo_process, self.exo_text), daemon=True).start()
             self.exo_start_time = time.time()
@@ -340,8 +340,8 @@ class ShauryaGUI:
         self.status_vars["Uptime"].set("00:00:00")
 
 if __name__ == "__main__":
-    if not os.path.exists("real_stock_injector.py") or not os.path.exists("bin\\Shaurya.exe"):
-        print("CRITICAL ERROR: Could not find 'real_stock_injector.py' or 'bin\\Shaurya.exe'.")
+    if not os.path.exists("yahoo.py") or not os.path.exists("bin\\Shaurya.exe"):
+        print("CRITICAL ERROR: Could not find 'yahoo.py' or 'bin\\Shaurya.exe'.")
         print("Please ensure you run this from the project root!")
     else:
         root = tk.Tk()
