@@ -1,4 +1,4 @@
-# ⚡ SHAURYA v0.3.0: Scalable High-Frequency Architecture for Ultra-Low Response Yield Access
+# ⚔️ SHAURYA v0.3.0: Scalable High-Frequency Architecture for Ultra-Low Response Yield Access
 > *A heterogeneous Software-in-the-Loop (SIL) execution engine that resolves the HFT trilemma — ultra-low latency, deterministic risk management, and deep learning inference — through compiler-driven fusion on commodity hardware.*
 
 ---
