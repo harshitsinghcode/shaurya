@@ -60,7 +60,9 @@ Unlike traditional approaches that force a choice between FPGA rigidity and soft
 
 SHAURYA's execution pipeline is built on five tightly integrated layers, each engineered to eliminate non-determinism at the specific abstraction level it targets:
 
-<img width="678" height="562" alt="image" src="https://github.com/user-attachments/assets/140c6827-20a1-406e-ba46-c9dee09428df" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/140c6827-20a1-406e-ba46-c9dee09428df" width="900"/>
+</p>
 
 **Compile-time optimization stack:**
 
