@@ -98,7 +98,7 @@ Benchmarked over a 50-stock basket (1,000 ticks) across two deployment environme
 | 90th Percentile | 6.3 µs |
 | 99th Percentile | 40.9 µs |
 | Peak (OS DPC spike) | 127 µs |
-| Speedup vs. Naïve Baseline | **81×** |
+| Speedup vs. Naïve Baseline | **81x** |
 
 **AWS EC2 (c6i.large, Ubuntu 22.04, Nitro Hypervisor):**
 
