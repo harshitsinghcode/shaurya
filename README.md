@@ -469,4 +469,4 @@ It is **not financial advice** and **not production-certified trading infrastruc
 
 - **PyPI:** [pypi.org/project/hft.shaurya](https://pypi.org/project/hft.shaurya)
 
-*ad astra per aspera 🛩️*
+## *ad astra per aspera 🛩️*
